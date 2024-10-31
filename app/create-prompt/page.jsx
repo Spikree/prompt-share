@@ -1,8 +1,10 @@
-"use client"; // Must be the very first line
+"use client";
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Form from "@components/Form";
 
@@ -13,7 +15,7 @@ const CreatePrompt = () => {
   const [submitting, setSubmitting] = useState(false);
   const [post, setPost] = useState({
     prompt: "",
-    tag: ""
+    tag: "",
   });
 
   const postPrompt = async (e) => {
@@ -21,18 +23,21 @@ const CreatePrompt = () => {
     setSubmitting(true);
 
     try {
-      const response = await fetch('/api/prompt/new', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/prompt/new", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt: post.prompt,
           userId: session?.user.id,
-          tag: post.tag
-        })
+          tag: post.tag,
+        }),
       });
 
       if (response.ok) {
-        router.push('/');
+        toast.success("Prompt uploaded sucessfully");
+        setTimeout(() => {
+          router.push("/");
+        }, 1500);
       }
     } catch (error) {
       console.error(error);
@@ -42,13 +47,26 @@ const CreatePrompt = () => {
   };
 
   return (
-    <Form
-      type="Create"
-      post={post}
-      setPost={setPost}
-      submitting={submitting}
-      handleSubmit={postPrompt}
-    />
+    <section>
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar={true}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      <Form
+        type="Create"
+        post={post}
+        setPost={setPost}
+        submitting={submitting}
+        handleSubmit={postPrompt}
+      />
+    </section>
   );
 };
 
