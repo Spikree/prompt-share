@@ -6,16 +6,19 @@ import { useState, useEffect } from "react";
 import { signIn, signOut, useSession, getProviders } from "next-auth/react";
 
 const Nav = () => {
-  const isUserLoggedIn = true;
+  const {data: session} = useSession();
 
   const [providers, setProviders] = useState(null);
   const [toggleDropDown, setToggleDropDown] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      const res = await getProviders();
-      setProviders(res)
-    })()
+    const setUpProviders = async () => {
+      const response = await getProviders();
+
+      setProviders(response)
+    }
+
+    setUpProviders();
   }, []);
 
   return (
@@ -33,7 +36,7 @@ const Nav = () => {
 
       {/* Desktop navigation */}
       <div className="sm:flex hidden">
-        {isUserLoggedIn ? (
+        {session?.user ? (
           <div className="flex gap-3 md:gap-5">
             <Link href="/create-prompt" className="black_btn">
               create post
@@ -45,7 +48,7 @@ const Nav = () => {
 
             <Link href="/profile">
               <Image
-                src="/assets/images/logo.svg"
+                src={session?.user.image}
                 width={37}
                 height={37}
                 className="rounded-full"
@@ -74,14 +77,14 @@ const Nav = () => {
 
       {/* mobile navigation */}
       <div className="sm:hidden flex relative">
-        {isUserLoggedIn ? (
+        {session?.user ? (
           <div className="flex">
             <Image
               alt="logo"
-              width={30}
-              height={30}
-              className="object-contain"
-              src="/assets/images/logo.svg"
+              width={37}
+              height={37}
+              className="object-contain rounded-full"
+              src={session?.user.image}
               onClick={() => {
                 setToggleDropDown((prev) => !prev);
               }}
