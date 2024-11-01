@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -21,8 +21,8 @@ const UpdatePrompt = () => {
   useEffect(() => {
     const getPromptDetails = async () => {
       try {
-        const response = await fetch(`/api/prompt/${promptId}`,{
-          method: 'GET',
+        const response = await fetch(`/api/prompt/${promptId}`, {
+          method: "GET",
         });
         const data = await response.json();
 
@@ -30,8 +30,8 @@ const UpdatePrompt = () => {
 
         setPost({
           prompt: data.prompt,
-          tag: data.tag
-        })
+          tag: data.tag,
+        });
       } catch (error) {
         console.log(error);
       }
@@ -40,35 +40,35 @@ const UpdatePrompt = () => {
   }, [promptId]);
 
   const updatePrompt = async (e) => {
-    e.preventDefault()
-    setSubmitting(true)
+    e.preventDefault();
+    setSubmitting(true);
 
-    if(!promptId) {
-      toast.error('Error updating prompt')
+    if (!promptId) {
+      toast.error("Error updating prompt");
       return;
     }
 
     try {
       const response = await fetch(`/api/prompt/${promptId}`, {
-        method: 'PATCH',
+        method: "PATCH",
         body: JSON.stringify({
           prompt: post.prompt,
-          tag:post.tag
-        })
-      })
+          tag: post.tag,
+        }),
+      });
 
-      if(response.ok) {
-        toast.success("Post updated sucessfully")
+      if (response.ok) {
+        toast.success("Post updated sucessfully");
         setTimeout(() => {
-          router.push('/')
-        },3000)
+          router.push("/");
+        }, 3000);
       }
     } catch (error) {
-      toast.error("error updating the post")
+      toast.error("error updating the post");
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   return (
     <section>
@@ -94,4 +94,12 @@ const UpdatePrompt = () => {
   );
 };
 
-export default UpdatePrompt;
+const UpdatePromptPage = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UpdatePrompt />
+    </Suspense>
+  );
+};
+
+export default UpdatePromptPage;
