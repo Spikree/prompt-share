@@ -12,23 +12,16 @@ export const POST = async (req) => {
     try {
         await connectToDb();
 
-        const userQuery = { username: searchInput };
-        const promptQuery = { $or: [{ prompt: searchInput }, { tag: searchInput }] };
+        let response = await User.find({ username: searchInput }) 
 
-        let response = await User.findOne(userQuery, '-email');
-
-        if (!response) {
-            response = await Prompt.findOne(promptQuery).populate('creator', '-email');
+        if(response.length === 0) {
+            response = await Prompt.find({searchInput})
         }
 
-        if (response) {
-            return new Response(JSON.stringify(response), { status: 200 });
-        } else {
-            return new Response("No matching document found", { status: 404 });
-        }
+        return new Response(JSON.stringify(response), {status:200})        
 
     } catch (error) {
-        console.error("Error in search:", error);
-        return new Response("Internal Server Error", { status: 500 });
+        console.log(error)
+        return new Response("Internal Server Error block reached", { status: 500 });
     }
 };
